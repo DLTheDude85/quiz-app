@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
+  <!-- Google Fonts: "Fredoka" (headings) and "Nunito" (body text).
+       If these fail to load, styles.css falls back to Gotham Rounded, Arial, or the browser's default sans-serif. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <!-- Page styling (colors, layout, buttons) -->
+  <link href="styles.css" rel="stylesheet">
+  <!-- Game logic. "defer" makes the script run after the page has loaded, so it can find the elements below -->
+  <script defer src="script.js"></script>
+
+  <!-- This is the text shown on the browser tab -->
+  <title>Are You Smarter Than a 5th Grader? Quiz | DevinLeeTech</title>
+<!-- SEO:START (written by tools/update-seo.py - do not edit by hand; change the PAGES table in that script instead) -->
+<meta name="description" content="Are You Smarter Than a 5th Grader? Answer 32 multiple-choice questions in this free browser quiz and see your score.">
+<link rel="canonical" href="https://devinleetech.com/games/quiz-app/">
+<meta property="og:site_name" content="DevinLeeTech">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Are You Smarter Than a 5th Grader? Quiz | DevinLeeTech">
+<meta property="og:description" content="Are You Smarter Than a 5th Grader? Answer 32 multiple-choice questions in this free browser quiz and see your score.">
+<meta property="og:url" content="https://devinleetech.com/games/quiz-app/">
+<meta property="og:image" content="https://devinleetech.com/images/social/games-quiz-app.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Are You Smarter Than a 5th Grader? Quiz">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Are You Smarter Than a 5th Grader? Quiz | DevinLeeTech">
+<meta name="twitter:description" content="Are You Smarter Than a 5th Grader? Answer 32 multiple-choice questions in this free browser quiz and see your score.">
+<meta name="twitter:image" content="https://devinleetech.com/images/social/games-quiz-app.jpg">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#070b14">
+<!-- SEO:END -->
+</head>
+<body>
+  <!-- The "notebook paper" card that holds the whole game.
+       The game has three screens inside it. script.js shows one at a time
+       by adding/removing the "hide" class:
+         1. #intro              - welcome text and the Start button
+         2. #question-container - the quiz itself
+         3. #results            - the final score and rating -->
+  <main class="card">
+
+    <!-- Game title: always visible on every screen -->
+    <header>
+      <!-- "Back to games" link at the top of the card. Hidden on the results screen
+           (which has its own Back to games button below).
+           The address it goes to is set in script.js (see GAMES_PAGE_URL). -->
+      <a id="back-link-top" class="back-link btn btn-secondary" href="../../games.html">← Back to games</a>
+      <h1>Are You Smarter Than a 5th Grader?</h1>
+    </header>
+
+    <!-- SCREEN 1: Intro (visible when the page first loads) -->
+    <section id="intro">
+      <!-- script.js fills in the real number of questions in the span below -->
+      <p class="lead">
+        Think you can keep up with the fifth grade? Answer
+        <span id="total-questions">all the</span> questions, and see how you score.
+      </p>
+      <button id="start-btn" class="start-btn btn btn-primary">Start quiz</button>
+    </section>
+
+    <!-- SCREEN 2: The quiz. Hidden until the player clicks Start. -->
+    <section id="question-container" class="hide">
+      <!-- Shows which question the player is on and their current score -->
+      <div class="status-row">
+        <span id="progress-text">Question 1</span>
+        <span id="score-text">Score: 0</span>
+      </div>
+
+      <!-- Progress bar (decorative: the text above already says the same thing, so it is hidden from screen readers) -->
+      <div class="progress-track" aria-hidden="true">
+        <div id="progress-bar" class="progress-fill"></div>
+      </div>
+
+      <!-- The question text. tabindex="-1" lets script.js move keyboard focus here for each new question -->
+      <h2 id="question" tabindex="-1">Question</h2>
+
+      <!-- The answer buttons for each question are created by script.js, so this starts empty -->
+      <div id="answer-buttons" class="btn-grid"></div>
+
+      <!-- Tells the player if they were right or wrong.
+           aria-live makes screen readers read the message out when it changes. -->
+      <p id="feedback" class="feedback" aria-live="polite"></p>
+
+      <!-- Goes to the next question. Hidden until an answer is chosen.
+           On the last question the text changes to "See results". -->
+      <div class="controls">
+        <button id="next-btn" class="next-btn btn btn-primary hide">Next</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: Results. Hidden until the last question has been answered. -->
+    <section id="results" class="hide">
+      <div class="report-card">
+        <h2 id="results-heading" tabindex="-1">Your report card</h2>
+        <div class="report-body">
+          <!-- Circled letter grade, like a teacher's red pen -->
+          <div class="grade-stamp">
+            <span class="sr-only">Grade: </span><span id="rating-grade">A</span>
+          </div>
+          <div>
+            <p class="final-score">
+              <span id="final-score">0 / 0</span>
+              <span id="final-percent" class="final-percent">0%</span>
+            </p>
+            <p id="rating-title" class="rating-title"></p>
+            <p id="rating-message" class="rating-message"></p>
+          </div>
+        </div>
+      </div>
+      <!-- Back to games (left) and Play again (right) -->
+      <div class="controls results-controls">
+        <a class="back-link btn btn-secondary" href="../../games.html">← Back to games</a>
+        <button id="restart-btn" class="btn btn-primary">Play again</button>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

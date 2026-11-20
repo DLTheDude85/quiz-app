@@ -1,0 +1,470 @@
+/* =====================================================================
+   "Are You Smarter Than a 5th Grader?" - Styles
+   ---------------------------------------------------------------------
+   Look and feel: a sheet of notebook paper (with a red margin line)
+   sitting on a navy "graph paper" background. Yellow "pencil" buttons
+   and a red-pen grade stamp on the results screen.
+   ===================================================================== */
+
+/* Apply to every element: include padding/border in element sizes */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- Design settings ----------
+   Change a value here and it updates everywhere it is used. */
+:root {
+  /* Fonts. If the first font isn't available, the browser tries the next one. */
+  --font-body: 'Nunito', 'Gotham Rounded', Arial, sans-serif;
+  --font-display: 'Fredoka', 'Gotham Rounded', Arial, sans-serif;
+
+  /* Colors */
+  --ink: #14213D;          /* dark navy: main text and button outlines */
+  --ink-soft: #4A5675;     /* softer navy: secondary text */
+  --paper: #FFFDF6;        /* cream: the card */
+  --pencil: #FFC933;       /* yellow: main buttons */
+  --margin-red: #D64550;   /* red: notebook margin line and grade stamp */
+  --focus: #2F5BEA;        /* blue: keyboard focus ring (stands out on every button) */
+
+  /* Colors for correct / wrong answers */
+  --good-bg: #C6EFD5;
+  --good-border: #1E8E54;
+  --good-text: #15683F;
+  --bad-bg: #F9CDD0;
+  --bad-border: #C93A44;
+  --bad-text: #A32A33;
+
+  /* Background color "hue" (0-360 on the color wheel) for each game state */
+  --hue-neutral: 222;   /* navy  - default */
+  --hue-wrong: 354;     /* red   - wrong answer */
+  --hue-correct: 152;   /* green - correct answer */
+}
+
+/* ---------- Page background ----------
+   Centers the card on the screen. The color comes from --hue, and
+   script.js adds "correct" or "wrong" to <body> to shift it to green or red.
+   The faint grid lines are drawn with two see-through gradients. */
+body {
+  --hue: var(--hue-neutral);
+  margin: 0;
+  padding: 24px 16px;
+  min-height: 100vh;
+  min-height: 100dvh;   /* better height on phones with moving browser bars */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background-color: hsl(var(--hue), 55%, 17%);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  transition: background-color 0.35s ease;   /* smooth fade between blue, green, and red */
+}
+
+body.correct {
+  --hue: var(--hue-correct);
+}
+
+body.wrong {
+  --hue: var(--hue-wrong);
+}
+
+/* ---------- The card (notebook paper) ---------- */
+.card {
+  position: relative;
+  width: 760px;
+  max-width: 100%;
+  padding: 32px 36px 32px 72px;   /* extra space on the left for the margin line */
+  background-color: var(--paper);
+  border-top: 8px solid var(--pencil);   /* yellow strip along the top */
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+/* The red vertical margin line, like on notebook paper */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 48px;
+  width: 2px;
+  background-color: var(--margin-red);
+  opacity: 0.45;
+}
+
+/* Game title */
+h1 {
+  margin: 0 0 20px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+/* Welcome text on the intro screen */
+.lead {
+  max-width: 52ch;
+  margin: 0 0 24px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+/* ---------- Progress and score row ---------- */
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+/* Progress bar: grey track with a yellow bar that fills as you answer */
+.progress-track {
+  height: 10px;
+  margin-bottom: 24px;
+  background-color: #E6E1D0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 0;   /* script.js sets the real width */
+  height: 100%;
+  background-color: #F2B705;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/* ---------- Question text ---------- */
+#question {
+  margin: 0 0 20px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.7rem;
+  line-height: 1.3;
+}
+
+/* script.js moves focus here for each new question; no outline needed on plain text */
+#question:focus,
+#results-heading:focus {
+  outline: none;
+}
+
+/* ---------- Answer buttons layout: 2 columns of equal width ---------- */
+.btn-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 0 0 12px;
+}
+
+/* ---------- Buttons (shared look) ----------
+   Chunky buttons with a solid shadow underneath that "press down" when clicked. */
+.btn {
+  font-family: var(--font-body);
+  font-weight: 800;
+  color: var(--ink);
+  background-color: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Lift slightly when the mouse is over an active button */
+.btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--ink);
+}
+
+/* Press down while being clicked */
+.btn:not(:disabled):active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+/* Visible focus ring for keyboard users (appears when tabbing through buttons).
+   This replaces the old "outline: none", which hid where the keyboard focus was. */
+.btn:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* Main action buttons (Start, Next, Play again) are yellow */
+.btn-primary {
+  background-color: var(--pencil);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  padding: 12px 28px;
+}
+
+/* ---------- "Back to games" link ----------
+   It is a link (<a>) that looks like a smaller, white button. */
+.btn-secondary {
+  display: inline-block;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  text-decoration: none;   /* removes the default link underline */
+  box-shadow: 0 3px 0 var(--ink);
+}
+
+/* The copy at the top of the card sits above the title */
+#back-link-top {
+  margin-bottom: 16px;
+}
+
+/* ---------- Answer buttons ---------- */
+.answer-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  text-align: left;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* Circle on the left of each answer: shows A, B, C, D (then a check or X after answering) */
+.answer-marker {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  background-color: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+
+/* After an answer is picked the buttons are locked (disabled): no pointer cursor */
+.answer-btn:disabled {
+  cursor: default;
+}
+
+/* The correct answer turns green (script.js adds the "correct" class) */
+.answer-btn.correct {
+  background-color: var(--good-bg);
+  border-color: var(--good-border);
+  box-shadow: 0 4px 0 var(--good-border);
+}
+
+.answer-btn.correct .answer-marker {
+  background-color: var(--good-border);
+  border-color: var(--good-border);
+  color: #fff;
+}
+
+/* The answer the player picked, if it was wrong, turns red (script.js adds the "wrong" class) */
+.answer-btn.wrong {
+  background-color: var(--bad-bg);
+  border-color: var(--bad-border);
+  box-shadow: 0 4px 0 var(--bad-border);
+}
+
+.answer-btn.wrong .answer-marker {
+  background-color: var(--bad-border);
+  border-color: var(--bad-border);
+  color: #fff;
+}
+
+/* Answers that were neither correct nor picked fade into the background */
+.answer-btn.dimmed {
+  opacity: 0.5;
+}
+
+/* ---------- Feedback message ("Correct!" / "Not quite...") ---------- */
+.feedback {
+  min-height: 1.5em;   /* reserves space so the card doesn't jump when the message appears */
+  margin: 8px 0 16px;
+  font-weight: 800;
+}
+
+.feedback.correct {
+  color: var(--good-text);
+}
+
+.feedback.wrong {
+  color: var(--bad-text);
+}
+
+/* ---------- Next / Play again button area ---------- */
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 64px;   /* keeps the card the same height whether or not Next is showing */
+}
+
+/* On the results screen: Back to games on the left, Play again on the right */
+.results-controls {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* ---------- Results screen ("report card") ---------- */
+.report-card {
+  margin-bottom: 20px;
+  padding: 24px;
+  background-color: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+}
+
+.report-card h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3rem;
+}
+
+.report-body {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* The circled letter grade, tilted like it was written by hand in red pen */
+.grade-stamp {
+  flex: none;
+  width: 110px;
+  height: 110px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 3.6rem;
+  color: var(--margin-red);
+  border: 5px solid var(--margin-red);
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+
+.final-score {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.2rem;
+}
+
+.final-percent {
+  margin-left: 8px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.rating-title {
+  margin: 8px 0 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.4rem;
+  line-height: 1.25;
+}
+
+.rating-message {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ---------- Utility classes ---------- */
+
+/* Hides an element. script.js adds/removes it to show or hide things.
+   (!important makes sure nothing else can accidentally override it.) */
+.hide {
+  display: none !important;
+}
+
+/* Hides text visually but keeps it available for screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Tablets and small laptops (768px wide or less) ---------- */
+@media screen and (max-width: 768px) {
+  .card {
+    padding: 24px 24px 24px 56px;
+  }
+  .card::before {
+    left: 36px;
+  }
+  h1 {
+    font-size: 1.7rem;
+  }
+  #question {
+    font-size: 1.45rem;
+  }
+}
+
+/* ---------- Phones (480px wide or less) ---------- */
+@media screen and (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+  .card {
+    padding: 20px 16px 20px 40px;
+  }
+  .card::before {
+    left: 24px;
+  }
+  h1 {
+    font-size: 1.45rem;
+  }
+  #question {
+    font-size: 1.3rem;
+  }
+  /* Stack answers in a single column so each one is wide and easy to tap */
+  .btn-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Full-width main buttons are easier to tap */
+  .btn-primary {
+    width: 100%;
+  }
+  /* On the results screen, stack the buttons: Play again on top, Back to games underneath */
+  .results-controls {
+    flex-direction: column-reverse;
+  }
+  .results-controls .btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
+  /* Stack the grade stamp above the score on the results screen */
+  .report-body {
+    flex-direction: column;
+    text-align: center;
+  }
+  .grade-stamp {
+    width: 90px;
+    height: 90px;
+    font-size: 3rem;
+  }
+}
+
+/* ---------- Respect "reduce motion" settings ----------
+   Some people turn this on in their device settings because animation bothers them. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
